@@ -1,4 +1,4 @@
-## elimai
+## elimai [![Build Status](https://travis-ci.org/dlokesh/elimai.png?branch=master)](https://travis-ci.org/dlokesh/elimai)
 
 A minimalistic static site generator in Clojure
 
