@@ -1,11 +1,12 @@
 (ns elimai.core
-  (:import (org.pegdown PegDownProcessor Extensions))
+  (:import [org.pegdown PegDownProcessor Extensions]
+  		   [java.io File])
   (:use [ring.adapter.jetty]
   		[clj-time.format :only [parse unparse formatters formatter]]
   		[watchtower.core])
-  (:require [clojure.java.io :refer [file]]
+  (:require [clojure.java.io :refer [resource file]]
   			[clojure.java.browse :refer [browse-url]]
-  			[clojure.string :refer [split]]
+  			[clojure.string :refer [split join]]
   			[selmer.parser :as parser]
   			[selmer.filters :as filters]
   			[compojure.core :refer [routes]]
@@ -16,13 +17,16 @@
 (def md (PegDownProcessor. Extensions/FENCED_CODE_BLOCKS))
 (def yyyy-MM-dd (formatters :date))
 (def dd-MMM-yyyy (formatter "dd MMM, yyyy"))
-(def ^:dynamic conf {:templates-folder "public/_templates", :posts-folder "public/_posts", :output-folder "public"})
+(def conf (read-string (slurp (resource "conf.clj"))))
+
+(defn path [values]
+	(join File/separator values))
 
 (defn template [name]
-	(str (:templates-folder conf) "/" name))
+	(path [(:templates-folder conf) name]))
 
 (defn output-file [name]
-	(file current-dir (:output-folder conf) name))
+	(file current-dir name))
 
 (defn config-selmer []
   (parser/set-resource-path! current-dir)
@@ -35,9 +39,10 @@
 
 (defn parse-data [file-]
 	(let [file-name (first (split (.getName file-) #"\."))
-		  post (slurp file-)
-		  post-meta (parse-meta post)]
-		(merge post-meta {:url (str "posts/" file-name ".html") :file-name file-name :content post})))
+		  url (path ["posts" (str file-name ".html")])
+		  post (slurp file-)]
+		(merge (parse-meta post) 
+			   {:url url :file-name file-name :content post})))
 
 (defn all-post-files []
 	(.listFiles (file current-dir (:posts-folder conf))))
@@ -86,5 +91,5 @@
   (render-all)
   (add-watcher)
 
-  (future (run-jetty (routes (files "/" {:root "public"})) {:port 8080}))
+  (future (run-jetty (routes (files "/" {:root "."})) {:port 8080}))
   (browse-url "http://localhost:8080"))
