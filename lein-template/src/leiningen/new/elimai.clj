@@ -13,7 +13,4 @@
     		 ["src/_templates/index.html" (render "_templates/index.html")]
          ["src/_templates/post.html" (render "_templates/post.html")]
     		 ["src/_posts/welcome.md" (render "welcome.md")]
-         ["css/default.css" (render "css/default.css")]
-         ["css/main.css" (render "css/main.css")]
-         ["css/solarized_light.css" (render "css/solarized_light.css")]
-         ["js/highlight.pack.js" (render "js/highlight.pack.js")])))
+         ["css/main.css" (render "css/main.css")])))
