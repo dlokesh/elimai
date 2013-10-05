@@ -15,4 +15,5 @@
     		 ["src/_templates/index.html" (render "_templates/index.html")]
          ["src/_templates/post.html" (render "_templates/post.html")]
     		 ["src/_posts/welcome.md" (render "welcome.md" data)]
+         [".gitignore" (render "gitignore")]
          ["css/main.css" (render "css/main.css")])))
