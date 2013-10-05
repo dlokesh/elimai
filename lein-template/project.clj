@@ -1,4 +1,4 @@
-(defproject elimai/lein-template "0.1.0"
+(defproject elimai/lein-template "0.1.1"
   :description "Leiningen template for elimai"
   :url "http://github.com/dlokesh/elimai/lein-template"
   :license {:name "Eclipse Public License"
