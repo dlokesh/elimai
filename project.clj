@@ -1,4 +1,4 @@
-(defproject elimai "0.1.0-SNAPSHOT"
+(defproject elimai "0.1.0"
   :description "A minimalistic static site generator in Clojure"
   :url "http://github.com/dlokesh/elimai"
   :license {:name "Eclipse Public License"
