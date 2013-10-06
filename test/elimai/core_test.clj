@@ -57,12 +57,12 @@
 		(render-post 1) => 1
 		(render-post 2) => 2))
 
-(fact "it should render index page"
+(fact "it should render index page with recent 10 posts"
 	(render-index) => true
 	(provided
-		(all-posts) => [1 2]
+		(all-posts) => (range 1 20)
 		(template "index.html") => "template-index"
-		(parser/render-file "template-index" {:posts [1 2]}) => "html content"
+		(parser/render-file "template-index" {:posts (range 1 11)}) => "html content"
 		(output-file "index.html") => "output-index"
 		(render "html content" "output-index") => true))
 

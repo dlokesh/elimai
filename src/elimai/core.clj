@@ -66,7 +66,7 @@
 	(doseq [post (all-posts)] (render-post post)))
 
 (defn render-index []
-	(let [index-html (parser/render-file (template "index.html") {:posts (all-posts)})]
+	(let [index-html (parser/render-file (template "index.html") {:posts (take 10 (all-posts))})]
 		(render index-html (output-file "index.html"))))
 
 (defn render-all [] 
