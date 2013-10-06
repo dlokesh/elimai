@@ -23,12 +23,19 @@
 		(provided 
 			(parse-meta content) => {:title "Welcome" :date "2013-09-20"})))
 
-(fact "it should fetch all posts sorted by date"
-	(all-posts) => [{:title "post2" :date "2013-09-29"} {:title "post1" :date "2013-09-20"}] 
+(fact "it should fetch all posts"
+	(all-posts) => [{:title "post1" :date "2013-09-20"} {:title "post2" :date "2013-09-29"}] 
 	(provided 
 		(all-post-files) => ["post1.md", "post2.md"]
 		(parse-data "post1.md") => {:title "post1" :date "2013-09-20"}
 		(parse-data "post2.md") => {:title "post2" :date "2013-09-29"}))
+
+(fact "it should fetch recent posts sorted by date"
+	(recent-posts 2) => [{:title "post3" :date "2013-09-30"} {:title "post2" :date "2013-09-29"}] 
+	(provided 
+		(all-posts) => [{:title "post1" :date "2013-09-20"} 
+						{:title "post3" :date "2013-09-30"} 
+						{:title "post2" :date "2013-09-29"}]))
 
 (fact "should render default template with given content"
 	(parser/set-resource-path! (str current-dir "/test/resources"))
@@ -52,17 +59,17 @@
 (fact "it should render all posts"
 	(render-posts) => nil
 	(provided 
-		(output-file "posts") => (file "resources/blah")
+		(output-file "posts") => (file "test/resources/posts")
 		(all-posts) => [1 2]
 		(render-post 1) => 1
 		(render-post 2) => 2))
 
-(fact "it should render index page with recent 10 posts"
+(fact "it should render index page with recent posts"
 	(render-index) => true
 	(provided
-		(all-posts) => (range 1 20)
+		(recent-posts 10) => [1 2]
 		(template "index.html") => "template-index"
-		(parser/render-file "template-index" {:posts (range 1 11)}) => "html content"
+		(parser/render-file "template-index" {:posts [1 2]}) => "html content"
 		(output-file "index.html") => "output-index"
 		(render "html content" "output-index") => true))
 

@@ -48,11 +48,10 @@
 	(.listFiles (file current-dir (:posts-folder conf))))
 
 (defn all-posts []
-	(let [files (all-post-files)]
-		(->> files
-			(map parse-data)
-			(sort-by :date)
-			reverse)))
+	(map parse-data (all-post-files)))
+
+(defn recent-posts [size]
+	(take size (->> (all-posts) (sort-by :date) reverse)))
 
 (defn render [content out-file]
 	(spit out-file (parser/render-file (template "default.html") {:content content})))
@@ -66,7 +65,7 @@
 	(doseq [post (all-posts)] (render-post post)))
 
 (defn render-index []
-	(let [index-html (parser/render-file (template "index.html") {:posts (take 10 (all-posts))})]
+	(let [index-html (parser/render-file (template "index.html") {:posts (recent-posts 10)})]
 		(render index-html (output-file "index.html"))))
 
 (defn render-all [] 
