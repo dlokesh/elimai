@@ -35,7 +35,7 @@
 
 (defn parse-meta [post]
 	(let [raw-meta (first (re-find #"(?<=\<!--)((?s).*?)(?=\-->)" post))]
-		(when-not (nil? raw-meta) (read-string raw-meta))))
+		(when raw-meta (read-string raw-meta))))
 
 (defn parse-data [file-]
 	(let [file-name (first (split (.getName file-) #"\."))
