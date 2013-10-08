@@ -15,12 +15,18 @@
 	(fact "it should return nil if meta data is not present"
 		(parse-meta "Content without metadata") => nil))
 
+(fact "it should construct-url for given file"
+	(construct-url (file "_posts/post.md")) => "posts/post.html"
+	(construct-url (file "posts/post.md")) => "posts/post.html"
+	(construct-url (file "posts/post.ext")) => "posts/post.ext")
+
 (fact "it should parse data from given file"
-	(let [content (slurp (test-resource "test.md"))]
-		(parse-data (test-resource "test.md"))
-			=> {:title "Welcome" :date "2013-09-20" :url "posts/test.html" 
-				:file-name "test" :content content}
+	(let [content (slurp (test-resource "test.md"))
+		  test-file (test-resource "test.md")]
+		(parse-data test-file)
+			=> {:title "Welcome" :date "2013-09-20" :url "resources/test.html" :content content}
 		(provided 
+			(construct-url test-file) => "resources/test.html"
 			(parse-meta content) => {:title "Welcome" :date "2013-09-20"})))
 
 (fact "it should fetch all posts"

@@ -1,12 +1,13 @@
 (ns elimai.core
   (:import [org.pegdown PegDownProcessor Extensions]
-  		   [java.io File])
+  		   [java.io File]
+         [java.net URLClassLoader])
   (:use [ring.adapter.jetty]
   		[clj-time.format :only [parse unparse formatters formatter]]
   		[watchtower.core])
   (:require [clojure.java.io :refer [resource file]]
   			[clojure.java.browse :refer [browse-url]]
-  			[clojure.string :refer [split join]]
+  			[clojure.string :refer [split join replace-first]]
   			[selmer.parser :as parser]
   			[selmer.filters :as filters]
   			[compojure.core :refer [routes]]
@@ -37,12 +38,15 @@
 	(let [raw-meta (first (re-find #"(?<=\<!--)((?s).*?)(?=\-->)" post))]
 		(when raw-meta (read-string raw-meta))))
 
+(defn construct-url [file-]
+  (let [[folder file-with-ext] (take-last 2 (split (.getPath file-) #"\/"))]
+    (path [(replace-first folder #"_" "") 
+           (replace-first file-with-ext #"md" "html")])))
+
 (defn parse-data [file-]
-	(let [file-name (first (split (.getName file-) #"\."))
-		  url (path ["posts" (str file-name ".html")])
-		  post (slurp file-)]
-		(merge (parse-meta post) 
-			   {:url url :file-name file-name :content post})))
+	(let [url (construct-url file-)
+		    post (slurp file-)]
+		(merge (parse-meta post) {:url url :content post})))
 
 (defn all-post-files []
 	(.listFiles (file current-dir (:posts-folder conf))))
@@ -74,8 +78,7 @@
 
 (defn re-render-all [file]
 	(println "Rendering" file "...")
-	(render-all)
-	(println "Done!"))
+	(render-all))
 
 (defn add-watcher []
   (watcher (vals (select-keys conf [:templates-folder :posts-folder]))
