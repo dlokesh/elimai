@@ -45,28 +45,36 @@
 
 (defn parse-data [file-]
 	(let [url (construct-url file-)
-		    post (slurp file-)]
-		(merge (parse-meta post) {:url url :content post})))
+		    content (slurp file-)]
+		(merge (parse-meta content) {:url url :content content})))
 
-(defn all-post-files []
-	(.listFiles (file current-dir (:posts-folder conf))))
+(defn list-files [folder]
+  (.listFiles (file current-dir folder)))
 
-(defn all-posts []
-	(map parse-data (all-post-files)))
+(defn parse-md-files [folder]
+  (map parse-data (list-files folder)))
 
 (defn recent-posts [size]
-	(take size (->> (all-posts) (sort-by :date) reverse)))
+	(take size (->> (parse-md-files (:posts-folder conf)) 
+                  (sort-by :date) 
+                  reverse)))
 
 (defn render [content out-file]
 	(spit out-file (parser/render-file (template "default.html") {:content content})))
 
-(defn render-post [post]
-	(let [post-html (parser/render-file (template "post.html") post)]
-		(render post-html (output-file (:url post)))))
+(defn render-html [file-name data]
+  (let [html (parser/render-file (template file-name) data)]
+    (render html (output-file (:url data)))))
 
 (defn render-posts []
 	(.mkdir (output-file "posts"))
-	(doseq [post (all-posts)] (render-post post)))
+	(doseq [post (parse-md-files (:posts-folder conf))] 
+    (render-html "post.html" post)))
+
+(defn render-pages []
+  (.mkdir (output-file "pages"))
+  (doseq [page (parse-md-files (:pages-folder conf))] 
+    (render-html "page.html" page)))
 
 (defn render-index []
 	(let [index-html (parser/render-file (template "index.html") {:posts (recent-posts 10)})]

@@ -29,19 +29,20 @@
 			(construct-url test-file) => "resources/test.html"
 			(parse-meta content) => {:title "Welcome" :date "2013-09-20"})))
 
-(fact "it should fetch all posts"
-	(all-posts) => [{:title "post1" :date "2013-09-20"} {:title "post2" :date "2013-09-29"}] 
+(fact "it should parse markdown files in folder"
+	(parse-md-files "folder") => [{:title "post1" :date "2013-09-20"} {:title "post2" :date "2013-09-29"}] 
 	(provided 
-		(all-post-files) => ["post1.md", "post2.md"]
+		(list-files "folder") => ["post1.md", "post2.md"]
 		(parse-data "post1.md") => {:title "post1" :date "2013-09-20"}
 		(parse-data "post2.md") => {:title "post2" :date "2013-09-29"}))
 
 (fact "it should fetch recent posts sorted by date"
-	(recent-posts 2) => [{:title "post3" :date "2013-09-30"} {:title "post2" :date "2013-09-29"}] 
-	(provided 
-		(all-posts) => [{:title "post1" :date "2013-09-20"} 
-						{:title "post3" :date "2013-09-30"} 
-						{:title "post2" :date "2013-09-29"}]))
+	(let [folder (:posts-folder conf)]
+		(recent-posts 2) => [{:title "post3" :date "2013-09-30"} {:title "post2" :date "2013-09-29"}] 
+		(provided 
+			(parse-md-files folder) => [{:title "post1" :date "2013-09-20"} 
+							{:title "post3" :date "2013-09-30"} 
+							{:title "post2" :date "2013-09-29"}])))
 
 (fact "should render default template with given content"
 	(parser/set-resource-path! (str current-dir "/test/resources"))
@@ -53,9 +54,9 @@
 			(slurp out) => "<div>some content</div>"
 			(.delete out))))
 
-(fact "it should render post template with given post data"
+(fact "it should render html template with given template and data"
 	(let [post {:title "post1" :url "post1-url" :date "2013-09-20"}]
-		(render-post post) => true
+		(render-html "post.html" post) => true
 		(provided 
 			(template "post.html") => "template-post"
 			(parser/render-file "template-post" post) => "html content"
@@ -63,12 +64,22 @@
 			(render "html content" "output-post1-url") => true)))
 
 (fact "it should render all posts"
-	(render-posts) => nil
-	(provided 
-		(output-file "posts") => (file "test/resources/posts")
-		(all-posts) => [1 2]
-		(render-post 1) => 1
-		(render-post 2) => 2))
+	(let [folder (:posts-folder conf)]
+		(render-posts) => nil
+		(provided 
+			(output-file "posts") => (file "test/resources/posts")
+			(parse-md-files folder) => [1 2]
+			(render-html "post.html" 1) => 1
+			(render-html "post.html" 2) => 2)))
+
+(fact "it should render all pages"
+	(let [folder (:pages-folder conf)]
+		(render-pages) => nil
+		(provided 
+			(output-file "pages") => (file "test/resources/pages")
+			(parse-md-files folder) => [1 2]
+			(render-html "page.html" 1) => 1
+			(render-html "page.html" 2) => 2)))
 
 (fact "it should render index page with recent posts"
 	(render-index) => true
