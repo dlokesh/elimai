@@ -14,6 +14,8 @@
     		 ["src/_templates/default.html" (render "_templates/default.html")]
     		 ["src/_templates/index.html" (render "_templates/index.html")]
          ["src/_templates/post.html" (render "_templates/post.html")]
+         ["src/_templates/page.html" (render "_templates/page.html")]
     		 ["src/_posts/welcome.md" (render "welcome.md" data)]
+         ["src/_pages/about.md" (render "about.md")]
          [".gitignore" (render "gitignore")]
          ["css/main.css" (render "css/main.css")])))

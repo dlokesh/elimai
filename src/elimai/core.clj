@@ -60,7 +60,9 @@
                   reverse)))
 
 (defn render [content out-file]
-	(spit out-file (parser/render-file (template "default.html") {:content content})))
+  (let [pages (parse-md-files (:pages-folder conf))]
+	 (spit out-file (parser/render-file (template "default.html") 
+      {:content content, :pages pages}))))
 
 (defn render-html [file-name data]
   (let [html (parser/render-file (template file-name) data)]
@@ -81,6 +83,7 @@
 		(render index-html (output-file "index.html"))))
 
 (defn render-all [] 
+  (render-pages)
 	(render-posts)
 	(render-index))
 

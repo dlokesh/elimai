@@ -46,13 +46,15 @@
 
 (fact "should render default template with given content"
 	(parser/set-resource-path! (str current-dir "/test/resources"))
-	(render "some content" (file current-dir "test/resources/out.html")) => nil	
-	(provided 
-		(template "default.html") => "default.html")
-	(fact "should spit out rendered content to file"
-		(let [out (test-resource "out.html")]
-			(slurp out) => "<div>some content</div>"
-			(.delete out))))
+	(let [folder (:pages-folder conf)]
+		(render "some content" (file current-dir "test/resources/out.html")) => nil	
+		(provided 
+			(parse-md-files folder) => [1 2]
+			(template "default.html") => "default.html")
+		(fact "should spit out rendered content to file"
+			(let [out (test-resource "out.html")]
+				(slurp out) => "<div>some content</div>\n<div>[1 2]</div>"
+				(.delete out)))))
 
 (fact "it should render html template with given template and data"
 	(let [post {:title "post1" :url "post1-url" :date "2013-09-20"}]
@@ -93,5 +95,6 @@
 (fact "render-all should render index and posts"
 	(render-all) => true
 	(provided 
+		(render-pages) => nil
 		(render-posts) => nil
 		(render-index) => true))
