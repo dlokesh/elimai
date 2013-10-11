@@ -24,7 +24,7 @@
             <h1 class="title"><a href="/">(->> elimai)</a></h1>
             <a class="extra" href="/">home</a>
             {% for page in pages %}
-                <a class="extra" href="{{ page.url }}">{{ page.title }}</a>
+                <a class="extra" href="{{ page.url|absolute }}">{{ page.title }}</a>
             {% endfor %}
           </div>
 

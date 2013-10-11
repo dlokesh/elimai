@@ -32,6 +32,7 @@
 (defn config-selmer []
   (parser/set-resource-path! current-dir)
   (filters/add-filter! :markdown (fn [s] [:safe (.markdownToHtml md s)]))
+  (filters/add-filter! :absolute (fn [s] (str "/" s)))
   (filters/add-filter! :format-dd-MMM-yyyy (fn [s] (unparse dd-MMM-yyyy (parse yyyy-MM-dd s)))))
 
 (defn parse-meta [post]
