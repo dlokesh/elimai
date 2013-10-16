@@ -93,7 +93,7 @@
 	(render-all))
 
 (defn add-watcher []
-  (watcher (vals (select-keys conf [:templates-folder :posts-folder]))
+  (watcher (vals (select-keys conf [:templates-folder :posts-folder :pages-folder]))
   	(rate 50)
   	(on-change re-render-all)))
 
